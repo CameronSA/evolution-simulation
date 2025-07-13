@@ -55,7 +55,7 @@ export class ThreeRenderer {
         food = result.food;
       }
 
-      if (currentTime - this.lastFoodUpdateTime > 1000) {
+      if (currentTime - this.lastFoodUpdateTime > 500) {
         // Top up the food
         const position = this.getRandomPosition();
         const foodItem = new Food(position.x, position.y);
