@@ -38,14 +38,17 @@ export class Bacterium {
   constructor(
     size: number,
     color: string,
+    speed: number,
+    sightRange: number,
+    awarenessRange: number,
     positionX: number,
     positionY: number
   ) {
     this.size = size;
     this.color = color;
-    this.speed = 0.01;
-    this.sightRange = 0.1;
-    this.awarenessRange = 0.1;
+    this.speed = speed;
+    this.sightRange = sightRange;
+    this.awarenessRange = awarenessRange;
 
     this.facingDirection = new THREE.Vector2(
       this.randomUnit(),
@@ -80,6 +83,9 @@ export class Bacterium {
       const newBacterium = new Bacterium(
         this.size,
         this.color,
+        this.speed,
+        this.sightRange,
+        this.awarenessRange,
         this.mesh.position.x,
         this.mesh.position.y
       );
@@ -140,7 +146,7 @@ export class Bacterium {
   }
 
   mutate() {
-    if (Math.random() < 0.66) {
+    if (Math.random() < 0.5) {
       return;
     }
 

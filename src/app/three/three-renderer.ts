@@ -134,8 +134,11 @@ export class ThreeRenderer {
       };
 
       const bacterium = new Bacterium(
-        this.getRandomSize(),
+        0.1,
         this.getRandomColor(),
+        0.01,
+        0.1,
+        0.1,
         position.x,
         position.y
       );
@@ -166,10 +169,6 @@ export class ThreeRenderer {
       x: (Math.floor(Math.random() * 90) - 45) / 10,
       y: (Math.floor(Math.random() * 90) - 45) / 10,
     };
-  }
-
-  private getRandomSize(): number {
-    return Math.random() / 3 + 0.05;
   }
 
   private processBacteriaActions(
