@@ -6,7 +6,6 @@ enum MutationType {
   speed, // Faster bacteria can escape predators and/or catch prey
   sight, // Bacteria with better sight can see further
   awareness, // Bacteria with better awareness can detect threats or food more easily
-  predation, // Bacteria with predation can consume other bacteria
 }
 
 export enum Action {
@@ -29,7 +28,6 @@ export class Bacterium {
   private sightRange: number; // How far the bacterium can see
   private awarenessRange: number; // How wide the bacterium's vision is, in radians
   private energy: number = 1000; // Each action consumes 1 energy. If energy reaches 0, the bacterium dies.
-  private isPredator: boolean = false; // If true, this bacterium can consume other bacteria
   private facingDirection: THREE.Vector2; // Direction the bacterium is facing
 
   private color: string;
@@ -100,16 +98,14 @@ export class Bacterium {
       }
     }
 
-    if (this.isPredator) {
-      const prey = this.lookForPrey(filteredBacteria);
-      if (prey) {
-        if (this.attemptToEat(prey.getMesh(), 0.9)) {
-          this.energy += 2000; // Consuming prey gives energy
-          return { action: Action.None };
-        } else {
-          this.energy -= 1; // Attempting to catch prey costs energy
-          return { action: Action.None };
-        }
+    const prey = this.lookForPrey(filteredBacteria);
+    if (prey) {
+      if (this.attemptToEat(prey.getMesh(), 0.9)) {
+        this.energy += 2000; // Consuming prey gives energy
+        return { action: Action.None };
+      } else {
+        this.energy -= 1; // Attempting to catch prey costs energy
+        return { action: Action.None };
       }
     }
 
@@ -156,8 +152,6 @@ export class Bacterium {
       case MutationType.awareness:
         this.awarenessRange += Math.random() / 2 - 0.25;
         break;
-      case MutationType.predation:
-        this.isPredator = true;
     }
   }
 
@@ -191,8 +185,8 @@ export class Bacterium {
 
   private lookForPredators(bacteria: Bacterium[]): Bacterium | undefined {
     for (const bacterium of bacteria) {
-      // Only need to flee if the bacterium is a predator and capable of consuming this bacterium
-      if (!bacterium.isPredator || bacterium.size <= this.size) {
+      // Only need to flee if the bacterium is capable of consuming this bacterium
+      if (bacterium.size <= this.size) {
         continue;
       }
 
