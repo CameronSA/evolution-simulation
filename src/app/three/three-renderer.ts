@@ -83,7 +83,7 @@ export class ThreeRenderer {
       return [];
     }
 
-    const foodCount = 100; // Number of food items to render
+    const foodCount = 1000; // Number of food items to render
     const food: Food[] = [];
     for (let i = 0; i < foodCount; i++) {
       const position = this.getRandomPosition();
