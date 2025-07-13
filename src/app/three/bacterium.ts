@@ -148,7 +148,7 @@ export class Bacterium {
         this.createMesh(this.mesh.position.x, this.mesh.position.y);
         break;
       case MutationType.speed:
-        this.speed += Math.random() / 100 - 0.005;
+        this.speed += Math.random() / 50 - 0.01;
         break;
       case MutationType.sight:
         this.sightRange += Math.random() / 2 - 0.25;
