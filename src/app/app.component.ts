@@ -1,13 +1,19 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ThreeRenderer } from './three/three-renderer';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'evolution-simulation';
+
+  constructor(private readonly threeRenderer: ThreeRenderer) {}
+
+  ngOnInit(): void {
+    this.threeRenderer.initThreeRenderer('threeCanvas');
+  }
 }
