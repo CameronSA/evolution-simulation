@@ -124,7 +124,11 @@ export class Bacterium {
     }
 
     // If no actions were taken, move in a random direction
-    this.moveInRandomDirection();
+    this.facingDirection = new THREE.Vector2(
+      this.facingDirection.x + this.randomUnit() / 10,
+      this.facingDirection.y + this.randomUnit() / 10
+    ).normalize();
+    this.move();
     this.energy -= 1;
     return { action: Action.None };
   }
@@ -235,12 +239,7 @@ export class Bacterium {
     return true;
   }
 
-  private moveInRandomDirection() {
-    this.facingDirection = new THREE.Vector2(
-      this.facingDirection.x + this.randomUnit() / 10,
-      this.facingDirection.y + this.randomUnit() / 10
-    ).normalize();
-
+  private move() {
     let newXPosition =
       this.mesh.position.x + this.facingDirection.x * this.speed;
     let newYPosition =
@@ -297,12 +296,13 @@ export class Bacterium {
       food.position.y - this.mesh.position.y
     ).normalize();
 
-    this.rotateToFace(this.facingDirection);
+    this.move();
 
-    this.mesh.position.x = food.position.x;
-    this.mesh.position.y = food.position.y;
+    if (this.hasSameLocation(food)) {
+      return Math.random() < successChance;
+    }
 
-    return Math.random() < successChance;
+    return false;
   }
 
   private isWithinSightRange(item: THREE.Mesh, range: number): boolean {
