@@ -206,32 +206,31 @@ export class Bacterium {
     const predatorPosition = predator.getMesh().position;
     const bacteriumPosition = this.mesh.position;
 
+    this.facingDirection = new THREE.Vector2(
+      bacteriumPosition.x - predatorPosition.x,
+      bacteriumPosition.y - predatorPosition.y
+    ).normalize();
+
+    this.rotateToFace(this.facingDirection);
+
     if (this.hasSameLocation(predator.getMesh())) {
       return false;
     }
 
-    const xDirectionToPredator = predatorPosition.x - bacteriumPosition.x;
-    const yDirectionToPredator = predatorPosition.y - bacteriumPosition.y;
-
-    const escapeVector = new THREE.Vector2(
-      -xDirectionToPredator,
-      -yDirectionToPredator
-    ).normalize();
-
-    let newXPosition = this.mesh.position.x + escapeVector.x * this.speed;
-    let newYPosition = this.mesh.position.y + escapeVector.y * this.speed;
+    let newXPosition =
+      this.mesh.position.x + this.facingDirection.x * this.speed;
+    let newYPosition =
+      this.mesh.position.y + this.facingDirection.y * this.speed;
 
     if (newXPosition > 5 || newXPosition < -5) {
-      escapeVector.x = -escapeVector.x;
+      this.facingDirection.x = -this.facingDirection.x;
     }
     if (newYPosition > 5 || newYPosition < -5) {
-      escapeVector.y = -escapeVector.y;
+      this.facingDirection.y = -this.facingDirection.y;
     }
 
     this.mesh.position.x = newXPosition;
     this.mesh.position.y = newYPosition;
-
-    this.rotateToFace(escapeVector);
 
     return true;
   }
