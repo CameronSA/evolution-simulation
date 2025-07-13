@@ -9,6 +9,7 @@ import { Food } from './food';
 })
 export class ThreeRenderer {
   private lastRenderTime: number = new Date().getTime();
+  private lastFoodUpdateTime: number = new Date().getTime();
   private scene: THREE.Scene | null = null;
   private camera: THREE.PerspectiveCamera | null = null;
   private renderer: THREE.WebGLRenderer | null = null;
@@ -52,6 +53,15 @@ export class ThreeRenderer {
         const result = this.processBacteriaActions(bacteria, food);
         bacteria = result.bacteria;
         food = result.food;
+      }
+
+      if (currentTime - this.lastFoodUpdateTime > 1000) {
+        // Top up the food
+        const position = this.getRandomPosition();
+        const foodItem = new Food(position.x, position.y);
+        this.scene?.add(foodItem.getMesh());
+        food.push(foodItem);
+        this.lastFoodUpdateTime = currentTime;
       }
     };
 
@@ -196,14 +206,6 @@ export class ThreeRenderer {
       if (!foodIdsToRemove.includes(foodItem.id)) {
         newFoodList.push(foodItem);
       }
-    }
-
-    // Top up the food
-    for (let i = 0; i < 300 - newFoodList.length; i++) {
-      const position = this.getRandomPosition();
-      const food = new Food(position.x, position.y);
-      this.scene?.add(food.getMesh());
-      newFoodList.push(food);
     }
 
     return {
