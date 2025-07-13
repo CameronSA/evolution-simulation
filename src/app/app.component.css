@@ -1,4 +1,15 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
 .three-canvas {
   width: 95dvw;
   height: 95dvh;
+}
+
+@media screen and (min-width: 600px) {
+  .container {
+    flex-direction: row;
+  }
 }

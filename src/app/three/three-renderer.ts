@@ -35,8 +35,6 @@ export class ThreeRenderer {
     this.renderer.setPixelRatio(devicePixelRatio);
     this.container.appendChild(this.renderer.domElement);
 
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const light = new THREE.AmbientLight(0x404040); // soft white light
     this.scene.add(light);
 
@@ -134,7 +132,7 @@ export class ThreeRenderer {
       };
 
       const bacterium = new Bacterium(
-        0.1,
+        0.2,
         this.getRandomColor(),
         0.01,
         0.1,
