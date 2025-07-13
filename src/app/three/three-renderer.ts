@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { throttle } from 'lodash-es';
+import { Subject } from 'rxjs';
 import * as THREE from 'three';
 import { Action, Bacterium } from './bacterium';
 import { Food } from './food';
@@ -15,6 +16,12 @@ export class ThreeRenderer {
   private renderer: THREE.WebGLRenderer | null = null;
   private container: HTMLElement | null = null;
   private readonly FPS = 60;
+
+  private bacteriaSubject = new Subject<Bacterium[]>();
+  public bacteria$ = this.bacteriaSubject.asObservable();
+
+  private foodSubject = new Subject<Food[]>();
+  public food$ = this.foodSubject.asObservable();
 
   initThreeRenderer(containerElementId: string) {
     this.scene = new THREE.Scene();
@@ -61,6 +68,9 @@ export class ThreeRenderer {
         food.push(foodItem);
         this.lastFoodUpdateTime = currentTime;
       }
+
+      this.bacteriaSubject.next(bacteria);
+      this.foodSubject.next(food);
     };
 
     this.renderer.setClearColor(0xeeeeee);
