@@ -76,7 +76,7 @@ export class Bacterium {
       return { action: Action.Die };
     }
 
-    if (this.energy > 2000) {
+    if (this.energy > 5000) {
       const newBacterium = new Bacterium(
         this.size,
         this.color,
@@ -88,7 +88,7 @@ export class Bacterium {
         newBacterium.mutate();
       }
 
-      this.energy -= 10000; // Reproducing costs energy
+      this.energy -= 4000; // Reproducing costs energy
       return {
         action: Action.Reproduce,
         newBacterium: newBacterium,
@@ -146,25 +146,20 @@ export class Bacterium {
 
     switch (mutationType) {
       case MutationType.size:
-        console.log('size mutation!');
         this.size += Math.random() / 2 - 0.25;
         break;
       case MutationType.speed:
-        console.log('speed mutation!');
         this.speed += Math.random() / 20 - 0.025;
         break;
       case MutationType.sight:
-        console.log('sight mutation!');
         this.sightRange += Math.random() / 2 - 0.25;
         break;
       case MutationType.awareness:
-        console.log('awareness mutation!');
         this.awarenessRange += Math.random() / 2 - 0.25;
         break;
       case MutationType.predation:
-        if (Math.random() >= 0.2) {
-          console.log('predation mutation!');
-          this.isPredator = !this.isPredator;
+        if (Math.random() >= 0.6) {
+          this.isPredator = true;
         }
     }
   }

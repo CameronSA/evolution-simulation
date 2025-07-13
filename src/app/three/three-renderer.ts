@@ -83,7 +83,7 @@ export class ThreeRenderer {
       return [];
     }
 
-    const foodCount = 1000; // Number of food items to render
+    const foodCount = 300; // Number of food items to render
     const food: Food[] = [];
     for (let i = 0; i < foodCount; i++) {
       const position = this.getRandomPosition();
@@ -196,6 +196,14 @@ export class ThreeRenderer {
       if (!foodIdsToRemove.includes(foodItem.id)) {
         newFoodList.push(foodItem);
       }
+    }
+
+    // Top up the food
+    for (let i = 0; i < 300 - newFoodList.length; i++) {
+      const position = this.getRandomPosition();
+      const food = new Food(position.x, position.y);
+      this.scene?.add(food.getMesh());
+      newFoodList.push(food);
     }
 
     return {
