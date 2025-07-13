@@ -100,7 +100,6 @@ export class ThreeRenderer {
       return [];
     }
 
-    /*
     // To avoid overlaps,
     // split the screen into equal squares
     // and place the bacteria in random squares
@@ -136,12 +135,11 @@ export class ThreeRenderer {
     }
 
     return bacteria;
-    */
 
-    const bacterium = new Bacterium(0.5, this.getRandomColor(), 0, 0);
-    this.scene.add(bacterium.getMesh());
+    // const bacterium = new Bacterium(0.5, this.getRandomColor(), 0, 0);
+    // this.scene.add(bacterium.getMesh());
 
-    return [bacterium];
+    // return [bacterium];
   }
 
   private getRandomColor() {

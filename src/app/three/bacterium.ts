@@ -44,8 +44,8 @@ export class Bacterium {
     this.size = size;
     this.color = color;
     this.speed = 0.01;
-    this.sightRange = 1;
-    this.awarenessRange = 2;
+    this.sightRange = 0.1;
+    this.awarenessRange = 0.1;
 
     this.facingDirection = new THREE.Vector2(
       this.randomUnit(),
