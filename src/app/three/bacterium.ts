@@ -55,19 +55,7 @@ export class Bacterium {
       this.randomUnit()
     ).normalize();
 
-    const shape = new THREE.Shape();
-    shape.moveTo(-this.size / 2, -this.size / 2);
-    shape.lineTo(-this.size / 2, this.size / 2);
-    shape.lineTo(this.size / 2, this.size / 2);
-    shape.lineTo(this.size, 0);
-    shape.lineTo(this.size / 2, -this.size / 2);
-    shape.lineTo(-this.size / 2, -this.size / 2);
-
-    const geometry = new THREE.ShapeGeometry(shape);
-    const material = new THREE.MeshBasicMaterial({ color: this.color });
-    this.mesh = new THREE.Mesh(geometry, material);
-    this.mesh.position.set(positionX, positionY, 0);
-    this.rotateToFace(this.facingDirection);
+    this.mesh = this.createMesh(positionX, positionY);
   }
 
   getMesh(): THREE.Mesh {
@@ -157,6 +145,7 @@ export class Bacterium {
     switch (mutationType) {
       case MutationType.size:
         this.size += Math.random() / 2 - 0.25;
+        this.createMesh(this.mesh.position.x, this.mesh.position.y);
         break;
       case MutationType.speed:
         this.speed += Math.random() / 20 - 0.025;
@@ -177,6 +166,25 @@ export class Bacterium {
   delete() {
     this.mesh.geometry.dispose();
     this.mesh.parent?.remove(this.mesh);
+  }
+
+  private createMesh(positionX: number, positionY: number): THREE.Mesh {
+    const shape = new THREE.Shape();
+    shape.moveTo(-this.size / 2, -this.size / 2);
+    shape.lineTo(-this.size / 2, this.size / 2);
+    shape.lineTo(this.size / 2, this.size / 2);
+    shape.lineTo(this.size, 0);
+    shape.lineTo(this.size / 2, -this.size / 2);
+    shape.lineTo(-this.size / 2, -this.size / 2);
+
+    const geometry = new THREE.ShapeGeometry(shape);
+    const material = new THREE.MeshBasicMaterial({ color: this.color });
+    this.mesh = new THREE.Mesh(geometry, material);
+
+    this.mesh.position.set(positionX, positionY, 0);
+    this.rotateToFace(this.facingDirection);
+
+    return this.mesh;
   }
 
   private randomUnit() {
