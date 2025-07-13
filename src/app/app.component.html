@@ -1,6 +1,16 @@
 <div class="container">
   <div class="side-bar">
-    <div>{{ bacteria.length }}</div>
+    <div>Total Bacteria: {{ bacteria.length }}</div>
+    <div>Total Food: {{ food.length }}</div>
+    <div class="leaderboard">
+      <div class="header">Leaderboard</div>
+      <div class="leaderboard-content">
+        <div class="leaderboard-item" *ngFor="let item of leaderboard">
+          <div class="colour-count">{{ item.bacteria }}</div>
+          <div class="colour-bar" [ngStyle]="{ 'background-color': item.colour, 'width': 10*item.bacteria + 'px', 'height':'20px'}"></div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="three-canvas" id="threeCanvas"></div>
 </div>

@@ -56,6 +56,10 @@ export class Bacterium {
     this.mesh = this.createMesh(positionX, positionY);
   }
 
+  getColour() {
+    return this.color;
+  }
+
   getMesh(): THREE.Mesh {
     return this.mesh;
   }
