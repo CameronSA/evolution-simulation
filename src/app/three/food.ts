@@ -14,4 +14,9 @@ export class Food {
   getMesh(): THREE.Mesh {
     return this.mesh;
   }
+
+  delete() {
+    this.mesh.geometry.dispose();
+    this.mesh.parent?.remove(this.mesh);
+  }
 }

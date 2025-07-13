@@ -8,10 +8,17 @@ enum MutationType {
   awareness, // Bacteria with better awareness can detect threats or food more easily
 }
 
-enum ActionResult {
+export enum Action {
   None,
   Reproduce,
   Die,
+  EatFood,
+}
+
+export interface ActionResult {
+  action: Action;
+  newBacterium?: Bacterium; // Only used if action is Reproduce
+  eatenFood?: Food; // Only used if action is EatFood
 }
 
 export class Bacterium {
@@ -36,7 +43,7 @@ export class Bacterium {
     this.size = size;
     this.color = color;
     this.speed = 0.01;
-    this.sightRange = 1.0;
+    this.sightRange = 0.1;
     this.awarenessRange = 0.1;
 
     this.facingDirection = new THREE.Vector2(
@@ -64,51 +71,64 @@ export class Bacterium {
   }
 
   act(bacteria: Bacterium[], food: Food[]): ActionResult {
-    // Implement behavior based on intelligence and speed
-    // For example, move towards food or away from predators
     if (this.energy <= 0) {
-      console.log(`Bacterium ${this.id} has died due to lack of energy.`);
-      return ActionResult.Die;
+      return { action: Action.Die };
     }
 
-    if (this.energy > 10) {
-      return ActionResult.Reproduce;
+    if (this.energy > 2000) {
+      const newBacterium = new Bacterium(
+        this.size,
+        this.color,
+        this.mesh.position.x,
+        this.mesh.position.y
+      );
+
+      if (Math.random() >= 0.5) {
+        newBacterium.mutate();
+      }
+
+      this.energy -= 2000; // Reproducing costs energy
+      return {
+        action: Action.Reproduce,
+        newBacterium: newBacterium,
+      };
     }
 
-    console.log('escape predation');
     const filteredBacteria = bacteria.filter((b) => b.id !== this.id);
     const predator = this.lookForPredators(filteredBacteria);
     if (predator) {
+      console.log('predator');
       if (this.attemptEscape(predator)) {
-        this.energy -= 1; // Escaping costs energy
-        return ActionResult.None;
+        this.energy -= 10; // Escaping costs energy
+        return { action: Action.None }; // Successfully escaped
       } else {
-        return ActionResult.Die; // Caught by predator
+        return { action: Action.Die }; // Failed to escape, bacterium dies
       }
     }
 
     if (this.isPredator) {
-      console.log('predation');
       const prey = this.lookForPrey(filteredBacteria);
       if (prey) {
         if (this.attemptToCatchPrey(prey)) {
-          this.energy += 1; // Consuming prey gives energy
-          return ActionResult.None;
+          this.energy += 333; // Consuming prey gives energy
+          return { action: Action.None };
         } else {
           this.energy -= 1; // Attempting to catch prey costs energy
-          return ActionResult.None;
+          return { action: Action.None };
         }
       }
     } else {
-      console.log('foraging');
       const foodItem = this.lookForFood(food);
       if (foodItem) {
         if (this.attemptToEatFood(foodItem)) {
-          this.energy += 1; // Consuming food gives energy
-          return ActionResult.None;
+          this.energy += 333; // Consuming food gives energy
+          return {
+            action: Action.EatFood,
+            eatenFood: foodItem,
+          };
         } else {
           this.energy -= 1; // Attempting to eat food costs energy
-          return ActionResult.None;
+          return { action: Action.None };
         }
       }
     }
@@ -116,8 +136,7 @@ export class Bacterium {
     // If no actions were taken, move in a random direction
     this.moveInRandomDirection();
     this.energy -= 1;
-
-    return ActionResult.None;
+    return { action: Action.None };
   }
 
   mutate() {
@@ -144,13 +163,19 @@ export class Bacterium {
     }
   }
 
+  delete() {
+    this.mesh.geometry.dispose();
+    this.mesh.parent?.remove(this.mesh);
+  }
+
   private randomUnit() {
     return Math.random() * 2 - 1;
   }
 
   private lookForPredators(bacteria: Bacterium[]): Bacterium | undefined {
     for (const bacterium of bacteria) {
-      if (!bacterium.isPredator) {
+      // Only need to flee if the bacterium is a predator and capable of consuming this bacterium
+      if (!bacterium.isPredator || bacterium.size <= this.size) {
         continue;
       }
 
@@ -225,14 +250,67 @@ export class Bacterium {
   }
 
   private lookForFood(food: Food[]): Food | undefined {
+    for (const foodItem of food) {
+      const mesh = foodItem.getMesh();
+      const canSee = this.isWithinSightRange(mesh, this.sightRange);
+      const canDetect = this.isWithinAwarenessRange(mesh, this.awarenessRange);
+
+      if (canSee && canDetect) {
+        return foodItem;
+      }
+    }
+
     return undefined;
   }
 
   private lookForPrey(bacteria: Bacterium[]): Bacterium | undefined {
+    for (const bacterium of bacteria) {
+      if (bacterium.size >= this.size) {
+        continue; // Only prey on smaller bacteria
+      }
+
+      const mesh = bacterium.getMesh();
+      const canSee = this.isWithinSightRange(mesh, this.sightRange);
+      const canDetect = this.isWithinAwarenessRange(mesh, this.awarenessRange);
+
+      if (canSee && canDetect) {
+        return bacterium;
+      }
+    }
+
     return undefined;
   }
 
   private attemptToEatFood(food: Food): boolean {
+    const foodPosition = food.getMesh().position;
+    const bacteriumPosition = this.mesh.position;
+
+    if (this.hasSameLocation(food.getMesh())) {
+      return true;
+    }
+
+    let xDistanceToFood = Math.abs(foodPosition.x - bacteriumPosition.x);
+    let yDistanceToFood = Math.abs(foodPosition.y - bacteriumPosition.y);
+
+    let xRange = bacteriumPosition.x * this.speed;
+    let yRange = bacteriumPosition.y * this.speed;
+
+    const directionToFood = new THREE.Vector2(
+      xDistanceToFood,
+      yDistanceToFood
+    ).normalize();
+
+    this.rotateToFace(directionToFood);
+
+    if (xRange <= xDistanceToFood && yRange <= yDistanceToFood) {
+      this.mesh.position.x = foodPosition.x;
+      this.mesh.position.y = foodPosition.y;
+      return true;
+    }
+
+    this.mesh.position.x += directionToFood.x * this.speed;
+    this.mesh.position.y += directionToFood.y * this.speed;
+
     return false;
   }
 
@@ -241,11 +319,27 @@ export class Bacterium {
   }
 
   private isWithinSightRange(item: THREE.Mesh, range: number): boolean {
-    return false;
+    const itemPosition = item.position;
+    const bacteriumPosition = this.mesh.position;
+
+    const xDistance = Math.abs(itemPosition.x - bacteriumPosition.x);
+    const yDistance = Math.abs(itemPosition.y - bacteriumPosition.y);
+    const distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+
+    return distance <= range;
   }
 
   private isWithinAwarenessRange(item: THREE.Mesh, range: number): boolean {
-    return false;
+    const itemPosition = item.position;
+    const bacteriumPosition = this.mesh.position;
+
+    const cosTheta =
+      itemPosition.dot(bacteriumPosition) /
+      (itemPosition.length() * bacteriumPosition.length());
+
+    const angle = Math.acos(cosTheta);
+
+    return angle <= range;
   }
 
   private hasSameLocation(item: THREE.Mesh): boolean {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { throttle } from 'lodash-es';
 import * as THREE from 'three';
-import { Bacterium } from './bacterium';
+import { Action, Bacterium } from './bacterium';
 import { Food } from './food';
 
 @Injectable({
@@ -39,8 +39,8 @@ export class ThreeRenderer {
     const light = new THREE.AmbientLight(0x404040); // soft white light
     this.scene.add(light);
 
-    const bacteria = this.renderBacteria();
-    const food = this.renderFood();
+    let bacteria = this.renderBacteria();
+    let food = this.renderFood();
 
     this.camera.position.z = 7;
 
@@ -49,8 +49,9 @@ export class ThreeRenderer {
       if (currentTime - this.lastRenderTime > 1000 / this.FPS) {
         this.lastRenderTime += 1000 / this.FPS;
         this.renderer!.render(this.scene!, this.camera!);
-
-        this.processBacteriaActions(bacteria, food);
+        const result = this.processBacteriaActions(bacteria, food);
+        bacteria = result.bacteria;
+        food = result.food;
       }
     };
 
@@ -82,7 +83,7 @@ export class ThreeRenderer {
       return [];
     }
 
-    const foodCount = 10; // Number of food items to render
+    const foodCount = 1000; // Number of food items to render
     const food: Food[] = [];
     for (let i = 0; i < foodCount; i++) {
       const position = this.getRandomPosition();
@@ -166,11 +167,42 @@ export class ThreeRenderer {
   private processBacteriaActions(
     bacteria: Bacterium[],
     food: Food[]
-  ): Bacterium[] {
+  ): { bacteria: Bacterium[]; food: Food[] } {
+    const bacteriaIdsToRemove: string[] = [];
+    const foodIdsToRemove: string[] = [];
+    const bacteriaToAdd: Bacterium[] = [];
+
     for (const bacterium of bacteria) {
       const actionResult = bacterium.act(bacteria, food);
+      if (actionResult.action === Action.Die) {
+        bacterium.delete();
+        bacteriaIdsToRemove.push(bacterium.id);
+      } else if (actionResult.action === Action.Reproduce) {
+        this.scene?.add(actionResult.newBacterium!.getMesh());
+        bacteriaToAdd.push(actionResult.newBacterium!);
+      } else if (actionResult.action === Action.EatFood) {
+        actionResult.eatenFood!.delete();
+        foodIdsToRemove.push(actionResult.eatenFood!.id);
+      }
     }
 
-    return bacteria;
+    const newBacteriaList: Bacterium[] = [];
+    for (const bacterium of bacteria) {
+      if (!bacteriaIdsToRemove.includes(bacterium.id)) {
+        newBacteriaList.push(bacterium);
+      }
+    }
+
+    const newFoodList: Food[] = [];
+    for (const foodItem of food) {
+      if (!foodIdsToRemove.includes(foodItem.id)) {
+        newFoodList.push(foodItem);
+      }
+    }
+
+    return {
+      bacteria: [...newBacteriaList, ...bacteriaToAdd],
+      food: newFoodList,
+    };
   }
 }
