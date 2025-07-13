@@ -145,8 +145,8 @@ export class ThreeRenderer {
         0.2,
         this.getRandomColor(),
         0.01,
-        0.1,
-        0.1,
+        0.5,
+        Math.PI/2,
         position.x,
         position.y
       );
