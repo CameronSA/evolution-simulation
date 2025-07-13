@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { throttle } from 'lodash-es';
 import * as THREE from 'three';
+import { Bacterium } from './bacterium';
+import { Food } from './food';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThreeRenderer {
+  private lastRenderTime: number = new Date().getTime();
   private scene: THREE.Scene | null = null;
   private camera: THREE.PerspectiveCamera | null = null;
   private renderer: THREE.WebGLRenderer | null = null;
   private container: HTMLElement | null = null;
-  private cube: THREE.Mesh | null = null;
   private readonly FPS = 60;
 
   initThreeRenderer(containerElementId: string) {
@@ -34,17 +36,25 @@ export class ThreeRenderer {
 
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    this.cube = new THREE.Mesh(geometry, material);
-    this.scene.add(this.cube);
+    const light = new THREE.AmbientLight(0x404040); // soft white light
+    this.scene.add(light);
 
-    this.camera.position.z = 5;
+    const bacteria = this.renderBacteria();
+    const food = this.renderFood();
+
+    this.camera.position.z = 7;
 
     const animate = () => {
-      this.cube!.rotation.x += 0.01;
-      this.cube!.rotation.y += 0.01;
-      this.renderer!.render(this.scene!, this.camera!);
+      const currentTime = new Date().getTime();
+      if (currentTime - this.lastRenderTime > 1000 / this.FPS) {
+        this.lastRenderTime += 1000 / this.FPS;
+        this.renderer!.render(this.scene!, this.camera!);
+
+        this.processBacteriaActions(bacteria, food);
+      }
     };
 
+    this.renderer.setClearColor(0xeeeeee);
     this.renderer.setAnimationLoop(animate);
 
     window.addEventListener(
@@ -65,5 +75,102 @@ export class ThreeRenderer {
       ),
       false
     );
+  }
+
+  private renderFood(): Food[] {
+    if (!this.scene || !this.renderer || !this.camera) {
+      return [];
+    }
+
+    const foodCount = 10; // Number of food items to render
+    const food: Food[] = [];
+    for (let i = 0; i < foodCount; i++) {
+      const position = this.getRandomPosition();
+      const foodItem = new Food(position.x, position.y);
+      food.push(foodItem);
+      this.scene.add(foodItem.getMesh());
+    }
+
+    return food;
+  }
+
+  private renderBacteria(): Bacterium[] {
+    if (!this.scene || !this.renderer || !this.camera) {
+      return [];
+    }
+
+    /*
+    // To avoid overlaps,
+    // split the screen into equal squares
+    // and place the bacteria in random squares
+    const sceneSquares: { x: number; y: number }[] = [];
+    for (let i = -5; i < 5; i++) {
+      for (let j = -5; j < 5; j++) {
+        sceneSquares.push({ x: i, y: j });
+      }
+    }
+
+    const renderChance = 0.5; // 50% chance to render a bacterium in each square
+    const bacteria: Bacterium[] = [];
+    for (let sceneSquare of sceneSquares) {
+      if (Math.random() > renderChance) {
+        continue;
+      }
+
+      const sceneSquarePosition = this.getRandomPosition();
+      const position = {
+        x: sceneSquarePosition.x / 10 + sceneSquare.x,
+        y: sceneSquarePosition.y / 10 + sceneSquare.y,
+      };
+
+      const bacterium = new Bacterium(
+        this.getRandomSize(),
+        this.getRandomColor(),
+        position.x,
+        position.y
+      );
+
+      bacteria.push(bacterium);
+      this.scene.add(bacterium.getMesh());
+    }
+
+    return bacteria;
+    */
+
+    const bacterium = new Bacterium(0.5, this.getRandomColor(), 0, 0);
+    this.scene.add(bacterium.getMesh());
+
+    return [bacterium];
+  }
+
+  private getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  private getRandomPosition(): { x: number; y: number } {
+    return {
+      x: (Math.floor(Math.random() * 90) - 45) / 10,
+      y: (Math.floor(Math.random() * 90) - 45) / 10,
+    };
+  }
+
+  private getRandomSize(): number {
+    return Math.random() / 3 + 0.05;
+  }
+
+  private processBacteriaActions(
+    bacteria: Bacterium[],
+    food: Food[]
+  ): Bacterium[] {
+    for (const bacterium of bacteria) {
+      const actionResult = bacterium.act(bacteria, food);
+    }
+
+    return bacteria;
   }
 }
