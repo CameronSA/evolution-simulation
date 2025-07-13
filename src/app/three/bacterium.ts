@@ -140,6 +140,10 @@ export class Bacterium {
   }
 
   mutate() {
+    if (Math.random() < 0.66) {
+      return;
+    }
+
     const mutationType = Math.floor(
       Math.random() * Object.keys(MutationType).length
     );
