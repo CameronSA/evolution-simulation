@@ -157,9 +157,7 @@ export class Bacterium {
         this.awarenessRange += Math.random() / 2 - 0.25;
         break;
       case MutationType.predation:
-        if (Math.random() >= 0.6) {
-          this.isPredator = true;
-        }
+        this.isPredator = true;
     }
   }
 
