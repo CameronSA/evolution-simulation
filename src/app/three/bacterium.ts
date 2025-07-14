@@ -86,7 +86,10 @@ export class Bacterium {
       };
     }
 
-    const filteredBacteria = bacteria.filter((b) => b.id !== this.id);
+    const filteredBacteria = this.sortBacteriaByDistance(
+      bacteria.filter((b) => b.id !== this.id)
+    );
+
     const predator = this.lookForPredators(filteredBacteria);
     if (predator) {
       if (this.attemptEscape(predator)) {
@@ -107,6 +110,8 @@ export class Bacterium {
         return { action: Action.None };
       }
     }
+
+    food = this.sortFoodByDistance(food);
 
     const foodItem = this.lookForFood(food);
     if (foodItem) {
@@ -161,6 +166,41 @@ export class Bacterium {
   delete() {
     this.mesh.geometry.dispose();
     this.mesh.parent?.remove(this.mesh);
+  }
+
+  // TODO: merge these two methods by getting Food and Bacteria to inherit from an interface and using generics
+  private sortFoodByDistance(food: Food[]): Food[] {
+    const distances: { food: Food; distance: number }[] = [];
+
+    for (let foodItem of food) {
+      const foodPosition = foodItem.getMesh().position;
+      const xDistance = this.mesh.position.x - foodPosition.x;
+      const yDistance = this.mesh.position.y - foodPosition.y;
+
+      const distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+      distances.push({ food: foodItem, distance: distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return distances.map((x) => x.food);
+  }
+
+  private sortBacteriaByDistance(bacteria: Bacterium[]): Bacterium[] {
+    const distances: { bacterium: Bacterium; distance: number }[] = [];
+
+    for (let bacterium of bacteria) {
+      const bacteriumPosition = bacterium.getMesh().position;
+      const xDistance = this.mesh.position.x - bacteriumPosition.x;
+      const yDistance = this.mesh.position.y - bacteriumPosition.y;
+
+      const distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+      distances.push({ bacterium: bacterium, distance: distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return distances.map((x) => x.bacterium);
   }
 
   private createMesh(positionX: number, positionY: number): THREE.Mesh {
