@@ -139,6 +139,7 @@ export class Bacterium {
   }
 
   mutate() {
+    // TODO: make configurable
     if (Math.random() < 0.2) {
       return;
     }
