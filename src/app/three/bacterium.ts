@@ -146,6 +146,7 @@ export class Bacterium {
       Math.random() * Object.keys(MutationType).length
     );
 
+    //TODO: guard against negative values
     switch (mutationType) {
       case MutationType.size:
         this.traits.size += Math.random() / 2 - 0.25;
@@ -205,12 +206,21 @@ export class Bacterium {
 
   private createMesh(positionX: number, positionY: number): THREE.Mesh {
     const shape = new THREE.Shape();
-    shape.moveTo(-this.traits.size / 2, -this.traits.size / 2);
-    shape.lineTo(-this.traits.size / 2, this.traits.size / 2);
-    shape.lineTo(this.traits.size / 2, this.traits.size / 2);
-    shape.lineTo(this.traits.size, 0);
-    shape.lineTo(this.traits.size / 2, -this.traits.size / 2);
-    shape.lineTo(-this.traits.size / 2, -this.traits.size / 2);
+
+    const sign = this.traits.size < 0 ? -1 : 1;
+
+    shape.moveTo(
+      (-sign * this.traits.size) / 2,
+      (-sign * this.traits.size) / 2
+    );
+    shape.lineTo((-sign * this.traits.size) / 2, (sign * this.traits.size) / 2);
+    shape.lineTo((sign * this.traits.size) / 2, (sign * this.traits.size) / 2);
+    shape.lineTo(sign * this.traits.size, 0);
+    shape.lineTo((sign * this.traits.size) / 2, (-sign * this.traits.size) / 2);
+    shape.lineTo(
+      (-sign * this.traits.size) / 2,
+      (-sign * this.traits.size) / 2
+    );
 
     const geometry = new THREE.ShapeGeometry(shape);
     const material = new THREE.MeshBasicMaterial({ color: this.color });
