@@ -32,30 +32,35 @@ export class AppComponent implements OnInit {
     let parameters = this.simulation.getSimulationParameters();
     parameters.startingBacteriumTraits.size = $event;
     this.simulation.updateSimulationParameters(parameters);
+    this.simulation.reset();
   }
 
   onInitialSpeedChanged($event: number) {
     let parameters = this.simulation.getSimulationParameters();
     parameters.startingBacteriumTraits.speed = $event;
     this.simulation.updateSimulationParameters(parameters);
+    this.simulation.reset();
   }
 
   onInitialSightRangeChanged($event: number) {
     let parameters = this.simulation.getSimulationParameters();
     parameters.startingBacteriumTraits.sightRange = $event;
     this.simulation.updateSimulationParameters(parameters);
+    this.simulation.reset();
   }
 
   onInitialAwarenessRangeChanged($event: number) {
     let parameters = this.simulation.getSimulationParameters();
     parameters.startingBacteriumTraits.awarenessRange = $event;
     this.simulation.updateSimulationParameters(parameters);
+    this.simulation.reset();
   }
 
   onInitialFoodCountChanged($event: number) {
     let parameters = this.simulation.getSimulationParameters();
     parameters.startingFoodCount = $event;
     this.simulation.updateSimulationParameters(parameters);
+    this.simulation.reset();
   }
 
   onInitialFoodReplenishmentRateChanged($event: number) {

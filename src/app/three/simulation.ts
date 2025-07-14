@@ -56,7 +56,6 @@ export class Simulation {
     this.startingFoodCount = parameters.startingFoodCount;
     this.foodReplenishmentRatePerSecond =
       parameters.foodReplenishmentRatePerSecond;
-    this.reset();
   }
 
   startSimulation(containerElementId: string) {
@@ -132,7 +131,7 @@ export class Simulation {
     );
   }
 
-  private reset() {
+  reset() {
     for (const bacterium of this.bacteria) {
       bacterium.delete();
     }
