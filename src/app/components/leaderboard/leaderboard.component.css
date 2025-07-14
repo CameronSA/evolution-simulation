@@ -9,7 +9,7 @@
 }
 
 .leaderboard-content {
-  max-height: 20rem;
+  max-height: 15rem;
   overflow-y: auto;
   width: 100%;
 }

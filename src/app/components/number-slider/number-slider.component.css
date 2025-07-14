@@ -1,7 +1,8 @@
 .container {
   display: flex;
-  justify-content: left;
-  height: 2rem;
+  flex-direction: column;
+  justify-content: start;
+  height: 4rem;
 }
 
 .slider-bar {
@@ -11,10 +12,24 @@
 
 .slider-name {
   padding: 0.5rem;
+  padding-bottom: 0;
+  margin-bottom: -1rem;
   width: 13rem;
 }
 
 .slider-value {
   padding: 0.5rem;
   width: 2rem;
+}
+
+@media screen and (min-width: 1440px) {
+  .container {
+    flex-direction: row;
+    height: 2rem;
+  }
+
+  .slider-name {
+    margin-bottom: 0;
+    padding-bottom: 0.5rem;
+  }
 }
