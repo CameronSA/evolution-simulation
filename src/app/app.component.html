@@ -1,23 +1,66 @@
 <div class="container">
-  <div class="side-bar">
-    <div>Total Bacteria: {{ bacteria.length }}</div>
-    <div>Total Food: {{ food.length }}</div>
-    <div class="leaderboard">
-      <div class="header">Leaderboard</div>
-      <div class="leaderboard-content">
-        <div class="leaderboard-item" *ngFor="let item of leaderboard">
-          <div class="colour-count">{{ item.bacteria }}</div>
-          <div
-            class="colour-bar"
-            [ngStyle]="{
-              'background-color': item.colour,
-              width: 10 * item.bacteria + 'px',
-              height: '20px'
-            }"
-          ></div>
-        </div>
-      </div>
+  <div class="info-bar">
+    <div class="header">Total Bacteria: {{ bacteria.length }}</div>
+    <div class="header">Total Food: {{ food.length }}</div>
+
+    <div class="sliders-container">
+      <app-number-slider
+        [minimum]="0.05"
+        [maximum]="0.5"
+        [step]="0.05"
+        [default]="0.2"
+        [displayMultiplier]="20"
+        name="Size"
+        (valueChangedEvent)="onInitialSizeChanged($event)"
+      ></app-number-slider>
+      <app-number-slider
+        [minimum]="0.001"
+        [maximum]="0.1"
+        [step]="0.001"
+        [default]="0.01"
+        [displayMultiplier]="1000"
+        name="Speed"
+        (valueChangedEvent)="onInitialSpeedChanged($event)"
+      ></app-number-slider>
+      <app-number-slider
+        [minimum]="0.1"
+        [maximum]="5"
+        [step]="0.1"
+        [default]="0.1"
+        [displayMultiplier]="10"
+        name="Sight"
+        (valueChangedEvent)="onInitialSightRangeChanged($event)"
+      ></app-number-slider>
+      <app-number-slider
+        [minimum]="0.62831"
+        [maximum]="3.14159"
+        [step]="0.31416"
+        [default]="0.7854"
+        [displayMultiplier]="1"
+        name="Awareness"
+        (valueChangedEvent)="onInitialAwarenessRangeChanged($event)"
+      ></app-number-slider>
+      <app-number-slider
+        [minimum]="1"
+        [maximum]="1000"
+        [step]="1"
+        [default]="300"
+        [displayMultiplier]="1"
+        name="Food"
+        (valueChangedEvent)="onInitialFoodCountChanged($event)"
+      ></app-number-slider>
+      <app-number-slider
+        [minimum]="1"
+        [maximum]="50"
+        [step]="1"
+        [default]="2"
+        [displayMultiplier]="1"
+        name="Food Spawn Rate"
+        (valueChangedEvent)="onInitialFoodReplenishmentRateChanged($event)"
+      ></app-number-slider>
     </div>
+    <app-leaderboard [leaderboard]="leaderboard"></app-leaderboard>
   </div>
-  <div class="three-canvas" id="threeCanvas"></div>
+
+  <div class="canvas-container" id="threeCanvas"></div>
 </div>

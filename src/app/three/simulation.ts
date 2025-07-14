@@ -5,10 +5,16 @@ import * as THREE from 'three';
 import { Action, Bacterium, BacteriumTraits } from './bacterium';
 import { Food } from './food';
 
+export interface SimulationParameters {
+  startingBacteriumTraits: BacteriumTraits;
+  startingFoodCount: number;
+  foodReplenishmentRatePerSecond: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
-export class ThreeRenderer {
+export class Simulation {
   private lastRenderTime: number = new Date().getTime();
   private lastFoodUpdateTime: number = new Date().getTime();
   private scene: THREE.Scene | null = null;
@@ -37,18 +43,23 @@ export class ThreeRenderer {
 
   private foodReplenishmentRatePerSecond = 2;
 
-  setStartingTraits(
-    startingTraits: BacteriumTraits,
-    startingFoodCount: number,
-    foodReplenishmentRatePerSecond: number
-  ) {
-    this.startingTraits = startingTraits;
-    this.startingFoodCount = startingFoodCount;
-    this.foodReplenishmentRatePerSecond = foodReplenishmentRatePerSecond;
+  getSimulationParameters(): SimulationParameters {
+    return {
+      startingBacteriumTraits: this.startingTraits,
+      startingFoodCount: this.startingFoodCount,
+      foodReplenishmentRatePerSecond: this.foodReplenishmentRatePerSecond,
+    };
+  }
+
+  updateSimulationParameters(parameters: SimulationParameters) {
+    this.startingTraits = parameters.startingBacteriumTraits;
+    this.startingFoodCount = parameters.startingFoodCount;
+    this.foodReplenishmentRatePerSecond =
+      parameters.foodReplenishmentRatePerSecond;
     this.reset();
   }
 
-  initThreeRenderer(containerElementId: string) {
+  startSimulation(containerElementId: string) {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -122,8 +133,19 @@ export class ThreeRenderer {
   }
 
   private reset() {
+    for (const bacterium of this.bacteria) {
+      bacterium.delete();
+    }
+
+    for (const foodItem of this.food) {
+      foodItem.delete();
+    }
+
     this.bacteria = this.renderBacteria();
     this.food = this.renderFood();
+
+    this.bacteriaSubject.next(this.bacteria);
+    this.foodSubject.next(this.food);
   }
 
   private renderFood(): Food[] {

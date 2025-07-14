@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  justify-content: left;
+  height: 2rem;
+}
+
+.slider-bar {
+  display: flex;
+  flex-direction: row;
+}
+
+.slider-name {
+  padding: 0.5rem;
+  width: 13rem;
+}
+
+.slider-value {
+  padding: 0.5rem;
+  width: 2rem;
+}

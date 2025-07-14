@@ -1,0 +1,20 @@
+<div class="container">
+  <div class="slider-name">{{ name }}</div>
+  <div class="slider-bar">
+    <div class="slider-container">
+      <mat-slider
+        [min]="minimum * displayMultiplier"
+        [max]="maximum * displayMultiplier"
+        [step]="step * displayMultiplier"
+      >
+        <input
+          #slider
+          matSliderThumb
+          [value]="default * displayMultiplier"
+          (change)="onChange(slider.value)"
+        />
+      </mat-slider>
+    </div>
+    <div class="slider-value">{{ toDisplayable(slider.value) }}</div>
+  </div>
+</div>
