@@ -393,7 +393,7 @@ export class Bacterium {
 
     const xDiff = bacteriumPosition.x - itemPosition.x;
     const yDiff = bacteriumPosition.y - itemPosition.y;
-    const tolerance = this.traits.speed / 2;
+    const tolerance = this.traits.speed;
     return Math.abs(xDiff) < tolerance && Math.abs(yDiff) < tolerance;
   }
 
