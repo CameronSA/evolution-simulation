@@ -100,6 +100,7 @@ export class Bacterium {
       }
     }
 
+    // TODO: This isn't working properly
     const prey = this.lookForPrey(filteredBacteria);
     if (prey) {
       if (this.attemptToEat(prey.getMesh(), 0.9)) {
