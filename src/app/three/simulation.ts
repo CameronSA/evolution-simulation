@@ -32,6 +32,7 @@ export class Simulation {
   private foodSubject = new Subject<Food[]>();
   public food$ = this.foodSubject.asObservable();
 
+  // TODO: Sync this with sliders
   private startingTraits: BacteriumTraits = {
     size: 0.2,
     speed: 0.01,
