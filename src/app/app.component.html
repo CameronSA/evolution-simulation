@@ -7,7 +7,14 @@
       <div class="leaderboard-content">
         <div class="leaderboard-item" *ngFor="let item of leaderboard">
           <div class="colour-count">{{ item.bacteria }}</div>
-          <div class="colour-bar" [ngStyle]="{ 'background-color': item.colour, 'width': 10*item.bacteria + 'px', 'height':'20px'}"></div>
+          <div
+            class="colour-bar"
+            [ngStyle]="{
+              'background-color': item.colour,
+              width: 10 * item.bacteria + 'px',
+              height: '20px'
+            }"
+          ></div>
         </div>
       </div>
     </div>

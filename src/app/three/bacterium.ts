@@ -21,12 +21,16 @@ export interface ActionResult {
   eatenFood?: Food; // Only used if action is EatFood
 }
 
+export interface BacteriumTraits {
+  size: number;
+  speed: number;
+  sightRange: number; // How far the bacterium can see
+  awarenessRange: number; // How wide the bacterium's vision is, in radians
+}
+
 export class Bacterium {
   id: string = crypto.randomUUID();
-  private size: number;
-  private speed: number;
-  private sightRange: number; // How far the bacterium can see
-  private awarenessRange: number; // How wide the bacterium's vision is, in radians
+  private traits: BacteriumTraits;
   private energy: number = 1000; // Each action consumes 1 energy. If energy reaches 0, the bacterium dies.
   private facingDirection: THREE.Vector2; // Direction the bacterium is facing
 
@@ -34,19 +38,13 @@ export class Bacterium {
   private mesh: THREE.Mesh;
 
   constructor(
-    size: number,
+    traits: BacteriumTraits,
     color: string,
-    speed: number,
-    sightRange: number,
-    awarenessRange: number,
     positionX: number,
     positionY: number
   ) {
-    this.size = size;
+    this.traits = traits;
     this.color = color;
-    this.speed = speed;
-    this.sightRange = sightRange;
-    this.awarenessRange = awarenessRange;
 
     this.facingDirection = new THREE.Vector2(
       this.randomUnit(),
@@ -71,11 +69,8 @@ export class Bacterium {
 
     if (this.energy > 5000) {
       const newBacterium = new Bacterium(
-        this.size,
+        this.traits,
         this.color,
-        this.speed,
-        this.sightRange,
-        this.awarenessRange,
         this.mesh.position.x,
         this.mesh.position.y
       );
@@ -148,17 +143,17 @@ export class Bacterium {
 
     switch (mutationType) {
       case MutationType.size:
-        this.size += Math.random() / 2 - 0.25;
+        this.traits.size += Math.random() / 2 - 0.25;
         this.createMesh(this.mesh.position.x, this.mesh.position.y);
         break;
       case MutationType.speed:
-        this.speed += Math.random() / 50 - 0.01;
+        this.traits.speed += Math.random() / 50 - 0.01;
         break;
       case MutationType.sight:
-        this.sightRange += Math.random() / 2 - 0.25;
+        this.traits.sightRange += Math.random() / 2 - 0.25;
         break;
       case MutationType.awareness:
-        this.awarenessRange += Math.random() / 2 - 0.25;
+        this.traits.awarenessRange += Math.random() / 2 - 0.25;
         break;
     }
   }
@@ -170,12 +165,12 @@ export class Bacterium {
 
   private createMesh(positionX: number, positionY: number): THREE.Mesh {
     const shape = new THREE.Shape();
-    shape.moveTo(-this.size / 2, -this.size / 2);
-    shape.lineTo(-this.size / 2, this.size / 2);
-    shape.lineTo(this.size / 2, this.size / 2);
-    shape.lineTo(this.size, 0);
-    shape.lineTo(this.size / 2, -this.size / 2);
-    shape.lineTo(-this.size / 2, -this.size / 2);
+    shape.moveTo(-this.traits.size / 2, -this.traits.size / 2);
+    shape.lineTo(-this.traits.size / 2, this.traits.size / 2);
+    shape.lineTo(this.traits.size / 2, this.traits.size / 2);
+    shape.lineTo(this.traits.size, 0);
+    shape.lineTo(this.traits.size / 2, -this.traits.size / 2);
+    shape.lineTo(-this.traits.size / 2, -this.traits.size / 2);
 
     const geometry = new THREE.ShapeGeometry(shape);
     const material = new THREE.MeshBasicMaterial({ color: this.color });
@@ -194,13 +189,16 @@ export class Bacterium {
   private lookForPredators(bacteria: Bacterium[]): Bacterium | undefined {
     for (const bacterium of bacteria) {
       // Only need to flee if the bacterium is capable of consuming this bacterium
-      if (bacterium.size <= this.size) {
+      if (bacterium.traits.size <= this.traits.size) {
         continue;
       }
 
       const mesh = bacterium.getMesh();
-      const canSee = this.isWithinSightRange(mesh, this.sightRange);
-      const canDetect = this.isWithinAwarenessRange(mesh, this.awarenessRange);
+      const canSee = this.isWithinSightRange(mesh, this.traits.sightRange);
+      const canDetect = this.isWithinAwarenessRange(
+        mesh,
+        this.traits.awarenessRange
+      );
 
       if (canSee && canDetect) {
         return bacterium;
@@ -226,9 +224,9 @@ export class Bacterium {
     }
 
     let newXPosition =
-      this.mesh.position.x + this.facingDirection.x * this.speed;
+      this.mesh.position.x + this.facingDirection.x * this.traits.speed;
     let newYPosition =
-      this.mesh.position.y + this.facingDirection.y * this.speed;
+      this.mesh.position.y + this.facingDirection.y * this.traits.speed;
 
     if (newXPosition > 5 || newXPosition < -5) {
       this.facingDirection.x = -this.facingDirection.x;
@@ -245,9 +243,9 @@ export class Bacterium {
 
   private move() {
     let newXPosition =
-      this.mesh.position.x + this.facingDirection.x * this.speed;
+      this.mesh.position.x + this.facingDirection.x * this.traits.speed;
     let newYPosition =
-      this.mesh.position.y + this.facingDirection.y * this.speed;
+      this.mesh.position.y + this.facingDirection.y * this.traits.speed;
 
     if (newXPosition > 5 || newXPosition < -5) {
       this.facingDirection.x = -this.facingDirection.x;
@@ -265,8 +263,11 @@ export class Bacterium {
   private lookForFood(food: Food[]): Food | undefined {
     for (const foodItem of food) {
       const mesh = foodItem.getMesh();
-      const canSee = this.isWithinSightRange(mesh, this.sightRange);
-      const canDetect = this.isWithinAwarenessRange(mesh, this.awarenessRange);
+      const canSee = this.isWithinSightRange(mesh, this.traits.sightRange);
+      const canDetect = this.isWithinAwarenessRange(
+        mesh,
+        this.traits.awarenessRange
+      );
 
       if (canSee && canDetect) {
         return foodItem;
@@ -278,13 +279,16 @@ export class Bacterium {
 
   private lookForPrey(bacteria: Bacterium[]): Bacterium | undefined {
     for (const bacterium of bacteria) {
-      if (bacterium.size >= this.size) {
+      if (bacterium.traits.size >= this.traits.size) {
         continue; // Only prey on smaller bacteria
       }
 
       const mesh = bacterium.getMesh();
-      const canSee = this.isWithinSightRange(mesh, this.sightRange);
-      const canDetect = this.isWithinAwarenessRange(mesh, this.awarenessRange);
+      const canSee = this.isWithinSightRange(mesh, this.traits.sightRange);
+      const canDetect = this.isWithinAwarenessRange(
+        mesh,
+        this.traits.awarenessRange
+      );
 
       if (canSee && canDetect) {
         return bacterium;
@@ -339,7 +343,7 @@ export class Bacterium {
 
     const xDiff = bacteriumPosition.x - itemPosition.x;
     const yDiff = bacteriumPosition.y - itemPosition.y;
-    const tolerance = 0.005;
+    const tolerance = this.traits.speed / 2;
     return Math.abs(xDiff) < tolerance && Math.abs(yDiff) < tolerance;
   }
 

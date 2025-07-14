@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { throttle } from 'lodash-es';
 import { Subject } from 'rxjs';
 import * as THREE from 'three';
-import { Action, Bacterium } from './bacterium';
+import { Action, Bacterium, BacteriumTraits } from './bacterium';
 import { Food } from './food';
 
 @Injectable({
@@ -17,11 +17,36 @@ export class ThreeRenderer {
   private container: HTMLElement | null = null;
   private readonly FPS = 60;
 
+  private bacteria: Bacterium[] = [];
+  private food: Food[] = [];
+
   private bacteriaSubject = new Subject<Bacterium[]>();
   public bacteria$ = this.bacteriaSubject.asObservable();
 
   private foodSubject = new Subject<Food[]>();
   public food$ = this.foodSubject.asObservable();
+
+  private startingTraits: BacteriumTraits = {
+    size: 0.2,
+    speed: 0.01,
+    sightRange: 0.1,
+    awarenessRange: Math.PI / 4,
+  };
+
+  private startingFoodCount = 300;
+
+  private foodReplenishmentRatePerSecond = 2;
+
+  setStartingTraits(
+    startingTraits: BacteriumTraits,
+    startingFoodCount: number,
+    foodReplenishmentRatePerSecond: number
+  ) {
+    this.startingTraits = startingTraits;
+    this.startingFoodCount = startingFoodCount;
+    this.foodReplenishmentRatePerSecond = foodReplenishmentRatePerSecond;
+    this.reset();
+  }
 
   initThreeRenderer(containerElementId: string) {
     this.scene = new THREE.Scene();
@@ -45,8 +70,7 @@ export class ThreeRenderer {
     const light = new THREE.AmbientLight(0x404040); // soft white light
     this.scene.add(light);
 
-    let bacteria = this.renderBacteria();
-    let food = this.renderFood();
+    this.reset();
 
     this.camera.position.z = 7;
 
@@ -55,22 +79,23 @@ export class ThreeRenderer {
       if (currentTime - this.lastRenderTime > 1000 / this.FPS) {
         this.lastRenderTime += 1000 / this.FPS;
         this.renderer!.render(this.scene!, this.camera!);
-        const result = this.processBacteriaActions(bacteria, food);
-        bacteria = result.bacteria;
-        food = result.food;
+        const result = this.processBacteriaActions(this.bacteria, this.food);
+        this.bacteria = result.bacteria;
+        this.food = result.food;
       }
 
-      if (currentTime - this.lastFoodUpdateTime > 500) {
+      const timeInterval = 1000 / this.foodReplenishmentRatePerSecond;
+      if (currentTime - this.lastFoodUpdateTime > timeInterval) {
         // Top up the food
         const position = this.getRandomPosition();
         const foodItem = new Food(position.x, position.y);
         this.scene?.add(foodItem.getMesh());
-        food.push(foodItem);
+        this.food.push(foodItem);
         this.lastFoodUpdateTime = currentTime;
       }
 
-      this.bacteriaSubject.next(bacteria);
-      this.foodSubject.next(food);
+      this.bacteriaSubject.next(this.bacteria);
+      this.foodSubject.next(this.food);
     };
 
     this.renderer.setClearColor(0xeeeeee);
@@ -96,14 +121,18 @@ export class ThreeRenderer {
     );
   }
 
+  private reset() {
+    this.bacteria = this.renderBacteria();
+    this.food = this.renderFood();
+  }
+
   private renderFood(): Food[] {
     if (!this.scene || !this.renderer || !this.camera) {
       return [];
     }
 
-    const foodCount = 300; // Number of food items to render
     const food: Food[] = [];
-    for (let i = 0; i < foodCount; i++) {
+    for (let i = 0; i < this.startingFoodCount; i++) {
       const position = this.getRandomPosition();
       const foodItem = new Food(position.x, position.y);
       food.push(foodItem);
@@ -142,11 +171,8 @@ export class ThreeRenderer {
       };
 
       const bacterium = new Bacterium(
-        0.2,
+        this.startingTraits,
         this.getRandomColor(),
-        0.01,
-        0.5,
-        Math.PI/2,
         position.x,
         position.y
       );
@@ -156,11 +182,6 @@ export class ThreeRenderer {
     }
 
     return bacteria;
-
-    // const bacterium = new Bacterium(0.5, this.getRandomColor(), 0, 0);
-    // this.scene.add(bacterium.getMesh());
-
-    // return [bacterium];
   }
 
   private getRandomColor() {
