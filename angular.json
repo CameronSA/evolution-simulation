@@ -93,7 +93,7 @@
           "options": {
             "repo": "https://github.com/CameronSA/evolution-simulation.git",
             "branch": "gh-pages",
-            "dir": "dist/<app-name>/browser"
+            "dir": "dist/evolution-simulation/browser"
           }
         }
       }
