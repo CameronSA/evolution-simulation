@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { NumberSliderComponent } from './components/number-slider/number-slider.component';
 import { Bacterium } from './three/bacterium';
 import { Food } from './three/food';
@@ -9,7 +8,7 @@ import { Simulation } from './three/simulation';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, LeaderboardComponent, NumberSliderComponent],
+  imports: [CommonModule, NumberSliderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
