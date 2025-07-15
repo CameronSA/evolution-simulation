@@ -89,7 +89,12 @@
           }
         },
         "deploy": {
-          "builder": "angular-cli-ghpages:deploy"
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {
+            "repo": "https://github.com/CameronSA/evolution-simulation.git",
+            "branch": "gh-pages",
+            "dir": "dist/<app-name>/browser"
+          }
         }
       }
     }
