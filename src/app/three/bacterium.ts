@@ -104,7 +104,7 @@ export class Bacterium {
     const prey = this.lookForPrey(filteredBacteria);
     if (prey) {
       if (this.attemptToEat(prey.getMesh())) {
-        this.energy += 2000; // Consuming prey gives energy
+        this.energy += 1000; // Consuming prey gives energy
         return { action: Action.None };
       } else {
         this.energy -= 1; // Attempting to catch prey costs energy
