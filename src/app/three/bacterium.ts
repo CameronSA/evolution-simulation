@@ -30,7 +30,7 @@ export interface BacteriumTraits {
 
 export class Bacterium {
   id: string = crypto.randomUUID();
-  private traits: BacteriumTraits;
+  traits: BacteriumTraits;
   private energy: number = 1000; // Each action consumes 1 energy. If energy reaches 0, the bacterium dies.
   private facingDirection: THREE.Vector2; // Direction the bacterium is facing
 
@@ -43,7 +43,7 @@ export class Bacterium {
     positionX: number,
     positionY: number
   ) {
-    this.traits = traits;
+    this.traits = { ...traits };
     this.color = color;
 
     this.facingDirection = new THREE.Vector2(
@@ -103,7 +103,7 @@ export class Bacterium {
     // TODO: This isn't working properly
     const prey = this.lookForPrey(filteredBacteria);
     if (prey) {
-      if (this.attemptToEat(prey.getMesh(), 0.9)) {
+      if (this.attemptToEat(prey.getMesh())) {
         this.energy += 2000; // Consuming prey gives energy
         return { action: Action.None };
       } else {
@@ -116,7 +116,7 @@ export class Bacterium {
 
     const foodItem = this.lookForFood(food);
     if (foodItem) {
-      if (this.attemptToEat(foodItem.getMesh(), 1)) {
+      if (this.attemptToEat(foodItem.getMesh())) {
         this.energy += 1000; // Consuming food gives energy
         return {
           action: Action.EatFood,
@@ -148,20 +148,39 @@ export class Bacterium {
       Math.random() * Object.keys(MutationType).length
     );
 
-    //TODO: guard against negative values
     switch (mutationType) {
       case MutationType.size:
-        this.traits.size += Math.random() / 2 - 0.25;
-        this.createMesh(this.mesh.position.x, this.mesh.position.y);
+        {
+          const mutation = Math.random() / 2 - 0.25;
+          if (this.traits.size + mutation > 0) {
+            this.traits.size += mutation;
+            this.createMesh(this.mesh.position.x, this.mesh.position.y);
+          }
+        }
         break;
       case MutationType.speed:
-        this.traits.speed += Math.random() / 50 - 0.01;
+        {
+          const mutation = Math.random() / 50 - 0.01;
+          if (this.traits.speed + mutation > 0) {
+            this.traits.speed += mutation;
+          }
+        }
         break;
       case MutationType.sight:
-        this.traits.sightRange += Math.random() / 2 - 0.25;
+        {
+          const mutation = Math.random() / 2 - 0.25;
+          if (this.traits.sightRange + mutation > 0) {
+            this.traits.sightRange += mutation;
+          }
+        }
         break;
       case MutationType.awareness:
-        this.traits.awarenessRange += Math.random() / 2 - 0.25;
+        {
+          const mutation = Math.random() / 2 - 0.25;
+          if (this.traits.awarenessRange + mutation > 0) {
+            this.traits.awarenessRange += mutation;
+          }
+        }
         break;
     }
   }
@@ -350,7 +369,7 @@ export class Bacterium {
     return undefined;
   }
 
-  private attemptToEat(food: THREE.Mesh, successChance: number): boolean {
+  private attemptToEat(food: THREE.Mesh): boolean {
     this.facingDirection = new THREE.Vector2(
       food.position.x - this.mesh.position.x,
       food.position.y - this.mesh.position.y
@@ -358,11 +377,7 @@ export class Bacterium {
 
     this.move();
 
-    if (this.hasSameLocation(food)) {
-      return Math.random() < successChance;
-    }
-
-    return false;
+    return this.hasSameLocation(food);
   }
 
   private isWithinSightRange(item: THREE.Mesh, range: number): boolean {

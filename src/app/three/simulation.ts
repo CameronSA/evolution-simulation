@@ -90,7 +90,10 @@ export class Simulation {
       if (currentTime - this.lastRenderTime > 1000 / this.FPS) {
         this.lastRenderTime += 1000 / this.FPS;
         this.renderer!.render(this.scene!, this.camera!);
-        const result = this.processBacteriaActions(this.bacteria, this.food);
+        const result = this.processBacteriaActions(
+          this.bacteria.slice(),
+          this.food.slice()
+        );
         this.bacteria = result.bacteria;
         this.food = result.food;
       }
