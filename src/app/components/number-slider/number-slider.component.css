@@ -3,6 +3,8 @@
   flex-direction: column;
   justify-content: start;
   height: 4rem;
+  padding-left: 0.2rem;
+  padding-right: 0.2rem;
 }
 
 .slider-bar {
@@ -14,12 +16,13 @@
   padding: 0.5rem;
   padding-bottom: 0;
   margin-bottom: -1rem;
-  width: 13rem;
+  width: 8.5rem;
 }
 
 .slider-value {
   padding: 0.5rem;
   width: 2rem;
+  font-weight: bold;
 }
 
 @media screen and (min-width: 1440px) {
