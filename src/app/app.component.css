@@ -32,6 +32,10 @@
 
 .stats-container {
   padding: 1rem;
+  background: #f8f9fa;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  border-radius: 5px;
+  max-height: 14rem;
 }
 
 .header {
@@ -43,10 +47,11 @@
   display: flex;
   flex-direction: row;
   padding-top: 1rem;
-  margin-left: 2rem;
+  margin-left: 1rem;
   min-height: 15rem;
   overflow: auto;
-  border: 1px solid black;
+  background: #f8f9fa;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
   border-radius: 5px;
   min-width: 28rem;
   max-height: 15rem;
@@ -55,18 +60,23 @@
 .leaderboard-container {
   display: flex;
   flex-direction: column;
-  border: 1px solid black;
+  background: #f8f9fa;
   border-radius: 5px;
   padding: 0.5rem;
   margin: 0.1rem;
+  margin-left: 1rem;
   width: 100%;
   max-height: 15rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 
 .leaderboard-content {
   max-height: 15rem;
   overflow-y: auto;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
 .leaderboard-item {
@@ -74,23 +84,42 @@
   flex-direction: row;
   justify-content: start;
   align-items: center;
+  border-radius: 10px;
+  padding: 0.2rem 0.5rem;
+  margin-bottom: 0.2rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 
 .colour-count {
-  padding-right: 0.1rem;
-  border: 1px solid black;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  height: 20px;
+  padding: 0 0.7rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  background: #fff;
+  border-radius: 8px 0 0 8px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .colour-bar {
-  border: 1px solid black;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(0, 0, 0, 0.04)
+  );
 }
 
 @media screen and (orientation: landscape) {
+  .stats-container {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    width: calc(100% - 3rem);
+  }
+
   .container {
     flex-direction: row;
     --info-bar-width: 45%;
@@ -110,7 +139,7 @@
   .sliders-container {
     display: block;
     margin: 0;
-    margin-top: 2rem;
+    margin-top: 1rem;
     min-width: 15rem;
     width: calc(100% - 1rem);
     margin-bottom: 1rem;
@@ -118,6 +147,7 @@
 
   .leaderboard-container {
     min-width: 14rem;
+    margin-left: 0;
     width: calc(100% - 2rem);
   }
 
@@ -129,6 +159,12 @@
 }
 
 @media screen and (min-width: 1024px) {
+  .stats-container {
+    width: calc(100% - 3rem);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
   .container {
     flex-direction: row;
   }
@@ -147,7 +183,7 @@
   .sliders-container {
     display: block;
     margin: 0;
-    margin-top: 2rem;
+    margin-top: 1rem;
     min-width: 0;
     width: calc(100% - 1rem);
   }
