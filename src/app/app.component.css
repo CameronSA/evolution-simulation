@@ -67,6 +67,9 @@
   max-height: 15rem;
   overflow-y: auto;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
 .leaderboard-item {
@@ -74,20 +77,34 @@
   flex-direction: row;
   justify-content: start;
   align-items: center;
+  background: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  padding: 0.2rem 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .colour-count {
-  padding-right: 0.1rem;
-  border: 1px solid black;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  height: 20px;
+  padding: 0 0.7rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  background: #fff;
+  border-radius: 8px 0 0 8px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .colour-bar {
-  border: 1px solid black;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(0, 0, 0, 0.04)
+  );
 }
 
 @media screen and (orientation: landscape) {
